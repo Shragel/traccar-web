@@ -49,5 +49,17 @@ Ext.define('Traccar.store.MapTypes', {
     }, {
         key: 'custom',
         name: Strings.mapCustom
+    }, {
+        key: 'GoogleRoad',
+        name: Strings.mapGoogleRoad
+    }, {
+        key: 'GoogleHybrid',
+        name: Strings.mapGoogleHybrid
+    }, {
+        key: 'GoogleSat',
+        name: Strings.mapGoogleSat
+    }, {
+        key: 'GoogleTraf',
+        name: Strings.mapGoogleTraf
     }]
 });
