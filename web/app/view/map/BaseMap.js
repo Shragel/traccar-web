@@ -46,6 +46,38 @@ Ext.define('Traccar.view.map.BaseMap', {
                     })
                 });
                 break;
+                     case 'GoogleRoad':
+                layer = new ol.layer.Tile({
+                    source: new ol.source.XYZ({
+                        url: 'https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga',
+                        attributions: ''
+                    })
+                });
+                break;
+				      case 'GoogleHybrid':
+                layer = new ol.layer.Tile({
+                    source: new ol.source.XYZ({
+                        url: 'https://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}&s=Ga',
+                        attributions: ''
+                    })
+                });
+                break;
+				      case 'GoogleSat':
+                layer = new ol.layer.Tile({
+                    source: new ol.source.XYZ({
+                        url: 'https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga',
+                        attributions: ''
+                    })
+                });
+                break;
+				      case 'GoogleTraf':
+                layer = new ol.layer.Tile({
+                    source: new ol.source.XYZ({
+                        url: 'https://mt0.google.com/vt/lyrs=m,traffic&hl=en&x={x}&y={y}&z={z}&s=Ga',
+                        attributions: ''
+                    })
+                });
+                break;
             case 'bingRoad':
                 layer = new ol.layer.Tile({
                     source: new ol.source.BingMaps({
