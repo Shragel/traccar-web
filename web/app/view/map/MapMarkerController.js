@@ -128,7 +128,16 @@ Ext.define('Traccar.view.map.MapMarkerController', {
                 return Traccar.Style.mapColorUnknown;
         }
     },
-
+ getDeviceColor2: function (ignition) {
+        switch (ignition) {
+            case 1:
+                return Traccar.Style.mapColorOnline;
+            case -1:
+                return Traccar.Style.mapColorOffline;
+            default:
+                return Traccar.Style.mapColorUnknown;
+        }
+    },
     updateDevice: function (store, data) {
         var i, device, deviceId, marker, style;
 
@@ -256,8 +265,9 @@ Ext.define('Traccar.view.map.MapMarkerController', {
         } else {
             marker = new ol.Feature(geometry);
             marker.set('record', device);
+            var t = JSON.stringify(position.get('attributes'));
+            style = this.getLatestMarker(this.getDeviceColor2( t.indexOf('"ignition":true')),
 
-            style = this.getLatestMarker(this.getDeviceColor(device),
                 position.get('course'),
                 device.get('category'));
             style.getText().setText(device.get('name'));
