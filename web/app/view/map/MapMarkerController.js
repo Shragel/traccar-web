@@ -1,21 +1,3 @@
-/*
- * Copyright 2015 - 2017 Anton Tananaev (anton@traccar.org)
- * Copyright 2016 - 2017 Andrey Kunitsyn (andrey@traccar.org)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 Ext.define('Traccar.view.map.MapMarkerController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.mapMarker',
@@ -118,26 +100,23 @@ Ext.define('Traccar.view.map.MapMarkerController', {
         return new ol.style.Style(styleConfig);
     },
 
-    getDeviceColor: function (device) {
-        switch (device.get('status')) {
-            case 'online':
-                return Traccar.Style.mapColorOnline;
-            case 'offline':
-                return Traccar.Style.mapColorOffline;
-            default:
-                return Traccar.Style.mapColorUnknown;
+    getDeviceColor: function(device) {
+        var position;
+        deviceId = device.get('id');
+        position = Ext.getStore('LatestPositions').findRecord('deviceId', deviceId, 0, false, false, true);
+        var t = JSON.stringify(position.get('attributes'));
+        var tt = t.indexOf('"ignition":true');
+        var st = device.get('status');
+        if (st == 'online' && tt > 0)
+
+        {
+            return Traccar.Style.mapColorOnline;
+        } else {
+            return Traccar.Style.mapColorOffline;
         }
     },
- getDeviceColor2: function (ignition) {
-        switch (ignition) {
-            case 1:
-                return Traccar.Style.mapColorOnline;
-            case -1:
-                return Traccar.Style.mapColorOffline;
-            default:
-                return Traccar.Style.mapColorUnknown;
-        }
-    },
+	 
+
     updateDevice: function (store, data) {
         var i, device, deviceId, marker, style;
 
@@ -226,7 +205,7 @@ Ext.define('Traccar.view.map.MapMarkerController', {
             projection = mapView.getProjection();
             center = ol.proj.fromLonLat([position.get('longitude'), position.get('latitude')]);
             pointResolution = ol.proj.getPointResolution(projection, mapView.getResolution(), center);
-            radius = position.get('accuracy') / ol.proj.Units.METERS_PER_UNIT.m * mapView.getResolution() / pointResolution;
+            radius = position.get('accuracy') / ol.proj.METERS_PER_UNIT.m * mapView.getResolution() / pointResolution;
 
             if (feature) {
                 feature.getGeometry().setCenter(center);
@@ -265,11 +244,11 @@ Ext.define('Traccar.view.map.MapMarkerController', {
         } else {
             marker = new ol.Feature(geometry);
             marker.set('record', device);
-            var t = JSON.stringify(position.get('attributes'));
-            style = this.getLatestMarker(this.getDeviceColor2( t.indexOf('"ignition":true')),
-
+                style = this.getLatestMarker(this.getDeviceColor(device),
                 position.get('course'),
                 device.get('category'));
+				
+				
             style.getText().setText(device.get('name'));
             marker.setStyle(style);
             marker.setId(device.get('id'));
@@ -467,6 +446,9 @@ Ext.define('Traccar.view.map.MapMarkerController', {
         if (this.selectedMarker) {
             if (this.selectedMarker.get('event')) {
                 this.getView().getMarkersSource().removeFeature(this.selectedMarker);
+                if (!marker || !marker.get('event')) {
+                    this.fireEvent('deselectevent');
+                }
             } else if (!Ext.getStore('ReportRoute').showMarkers &&
                     this.selectedMarker.get('record') instanceof Traccar.model.Position) {
                 this.getView().getMarkersSource().removeFeature(this.selectedMarker);
@@ -503,13 +485,12 @@ Ext.define('Traccar.view.map.MapMarkerController', {
                 this.reportMarkers[position.get('id')] = this.addReportMarker(position);
             }
             this.selectMarker(this.reportMarkers[position.get('id')], center);
-        } else if (this.selectedMarker) {
-            this.selectMarker(null, false);
         }
     },
 
     selectEvent: function (position) {
         var marker;
+        this.fireEvent('deselectfeature');
         if (position) {
             marker = this.addReportMarker(position);
             marker.set('event', true);
